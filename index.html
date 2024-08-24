@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="text-center py-4">
+            <h3>Smart House System</h3>
+        </div>
+        <a href="index.html">Dashboard</a>
+        <a href="datasensor.html">Data Sensor</a>
+        <a href="history.html">Action History</a>
+        <a href="profile.html">Profile</a>
+    </div>
+
+    <div class="content">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card p-3 sensor-card">
+                    <h4>Sensor Information</h4>
+                    <div class="sensor-icon">🌡️</div>
+                    <div class="gauge" id="temperatureGauge">
+                        <canvas width="150" height="75"></canvas>
+                    </div>
+                    <div class="gauge-label">Temperature: <span id="temperature">--</span> °C</div>
+                    <div class="sensor-icon">💧</div>
+                    <div class="gauge" id="humidityGauge">
+                        <canvas width="150" height="75"></canvas>
+                    </div>
+                    <div class="gauge-label">Humidity: <span id="humidity">--</span> %</div>
+                    <div class="sensor-icon">💡</div>
+                    <div class="gauge" id="lightGauge">
+                        <canvas width="150" height="75"></canvas>
+                    </div>
+                    <div class="gauge-label">Light: <span id="light">--</span> Lx</div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card p-3">
+                    <h4>Data Chart</h4>
+                    <canvas id="myChart" height="400"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card p-3 device-controls">
+                    <h4>Device Controls</h4>
+                    <div class="d-flex justify-content-around">
+                        <div class="sensor-card">
+                            <div class="sensor-icon">🌀</div>
+                            <div class="sensor-value">Fan</div>
+                            <button class="control-button" id="fan-button" onclick="toggleDevice2('fan')">Off</button>
+                        </div>
+                        <div class="sensor-card">
+                            <div class="sensor-icon">💡</div>
+                            <div class="sensor-value">Light</div>
+                            <button class="control-button" id="light-button" onclick="toggleDevice2('light')">Off</button>
+                        </div>
+                        <div class="sensor-card">
+                            <div class="sensor-icon">❄️</div>
+                            <div class="sensor-value">Air Conditioner</div>
+                            <button class="control-button" id="ac-button" onclick="toggleDevice2('ac')">Off</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="scripts.js"></script>
+</body>
+</html>
