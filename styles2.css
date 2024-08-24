@@ -31,11 +31,11 @@ body {
 }
 .profile-card {
     background-color: #fff;
-    padding: 30px;
+    padding: 100px;
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     text-align: center;
-    width: 350px;
+    width: 800px;
 }
 .profile-image {
     border-radius: 50%;
