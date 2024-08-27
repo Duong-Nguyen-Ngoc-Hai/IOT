@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device History</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles2.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="text-center py-4">
+            <h3>Smart House System</h3>
+        </div>
+        <a href="index.html">Dashboard</a>
+        <a href="datasensor.html">Data Sensor</a>
+        <a href="history.html">Action History</a>
+        <a href="profile.html">Profile</a>
+    </div>
+    <div class="content">
+        <div class="container">
+            <h2>Device On/Off History</h2>
+            <button class="btn btn-danger mb-3" onclick="deleteAllHistory()">Delete All History</button>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Device</th>
+                        <th>Status</th>
+                        <th>Timestamp</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                    <!-- History records will be inserted here by JavaScript -->
+                </tbody>
+            </table>
+            <nav>
+                <ul class="pagination justify-content-center" id="pagination">
+                    <!-- Pagination buttons will be inserted here by JavaScript -->
+                </ul>
+            </nav>
+        </div>
+    </div>
+    <script src="scripts.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const history = JSON.parse(localStorage.getItem('deviceHistory')) || [];
+            const sortedHistory = history.sort((a, b) => b.timestamp - a.timestamp);
+            const itemsPerPage = 10;
+            let currentPage = 1;
+
+            function renderTable(page) {
+                const start = (page - 1) * itemsPerPage;
+                const end = start + itemsPerPage;
+                const paginatedHistory = sortedHistory.slice(start, end);
+
+                const historyTableBody = document.getElementById('historyTableBody');
+                historyTableBody.innerHTML = '';
+
+                paginatedHistory.forEach((record, index) => {
+                    const row = document.createElement('tr');
+                    if(record.status=="On"){
+                        record.status="Off";
+                    } else {
+                        record.status="On";
+                    }
+                    row.innerHTML = `
+                        <td>${record.device}</td>
+                        <td>${record.status}</td>
+                        <td>${new Date(record.timestamp).toLocaleString()}</td>
+                        <td><button class="btn btn-danger btn-sm" onclick="deleteHistory(${start + index})">Delete</button></td>
+                    `;
+                    historyTableBody.appendChild(row);
+                });
+            }
+
+            function renderPagination() {
+                const totalPages = Math.ceil(sortedHistory.length / itemsPerPage);
+                const pagination = document.getElementById('pagination');
+                pagination.innerHTML = '';
+
+                const maxVisiblePages = 5;
+                let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+                let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+                if (endPage - startPage < maxVisiblePages - 1) {
+                    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                }
+
+                if (startPage > 1) {
+                    pagination.appendChild(createPageItem(1));
+                    if (startPage > 2) {
+                        pagination.appendChild(createEllipsis());
+                    }
+                }
+
+                for (let i = startPage; i <= endPage; i++) {
+                    pagination.appendChild(createPageItem(i));
+                }
+
+                if (endPage < totalPages) {
+                    if (endPage < totalPages - 1) {
+                        pagination.appendChild(createEllipsis());
+                    }
+                    pagination.appendChild(createPageItem(totalPages));
+                }
+            }
+
+            function createPageItem(page) {
+                const li = document.createElement('li');
+                li.classList.add('page-item');
+                if (page === currentPage) {
+                    li.classList.add('active');
+                }
+                li.innerHTML = `<a class="page-link" href="#">${page}</a>`;
+                li.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    currentPage = page;
+                    renderTable(currentPage);
+                    renderPagination();
+                });
+                return li;
+            }
+
+            function createEllipsis() {
+                const li = document.createElement('li');
+                li.classList.add('page-item', 'disabled');
+                li.innerHTML = `<span class="page-link">...</span>`;
+                return li;
+            }
+
+            window.deleteHistory = function(index) {
+                sortedHistory.splice(index, 1);
+                localStorage.setItem('deviceHistory', JSON.stringify(sortedHistory));
+                renderTable(currentPage);
+                renderPagination();
+            };
+
+            window.deleteAllHistory = function() {
+                localStorage.removeItem('deviceHistory');
+                sortedHistory.length = 0;
+                renderTable(currentPage);
+                renderPagination();
+            };
+
+            renderTable(currentPage);
+            renderPagination();
+        });
+    </script>
+</body>
+</html>

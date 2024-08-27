@@ -14,7 +14,7 @@
         </div>
         <a href="index.html">Dashboard</a>
         <a href="datasensor.html">Data Sensor</a>
-        <a href="history.html">Action History</a>
+        <a href="history.html">Activity History</a>
         <a href="profile.html">Profile</a>
     </div>
 
@@ -76,5 +76,16 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="scripts.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const deviceStates = JSON.parse(localStorage.getItem('deviceStates')) || {};
+            for (const [device, status] of Object.entries(deviceStates)) {
+                const button = document.getElementById(`${device}-button`);
+                const isActive = status === 'On';
+                button.classList.toggle('active', isActive);
+                button.innerText = status;
+            }
+        });
+    </script>
 </body>
 </html>

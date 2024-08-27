@@ -80,13 +80,25 @@ function updateGaugeColors() {
 
 function toggleDevice2(device) {
     const button = document.getElementById(`${device}-button`);
-    const isActive = button.classList.toggle('active');
+    const isActive = button.classList.contains('active');
 
-    if (isActive) {
-        button.innerText = 'On';
-    } else {
-        button.innerText = 'Off';
-    }
+    const status = isActive ? 'Off' : 'On'; // Correct the status logic
+    button.innerText = status;
+    button.classList.toggle('active'); // Toggle the class after setting the status
+
+    // Store device state in local storage
+    const deviceStates = JSON.parse(localStorage.getItem('deviceStates')) || {};
+    deviceStates[device] = status;
+    localStorage.setItem('deviceStates', JSON.stringify(deviceStates));
+
+    // Store history in local storage
+    const history = JSON.parse(localStorage.getItem('deviceHistory')) || [];
+    history.push({
+        device,
+        status,
+        timestamp: Date.now()
+    });
+    localStorage.setItem('deviceHistory', JSON.stringify(history));
 }
 
 setInterval(updateGaugeColors, 2000);

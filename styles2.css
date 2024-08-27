@@ -24,8 +24,7 @@ body {
 .content {
     margin-left: 210px;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column; /* Align items to the top */
     width: calc(100% - 210px);
     height: 100vh;
 }
