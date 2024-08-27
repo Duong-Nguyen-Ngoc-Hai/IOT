@@ -59,3 +59,11 @@ body {
 .profile-link a:hover {
     text-decoration: underline;
 }
+.arrow {
+    margin-left: 5px;
+    font-size: 12px;
+    cursor: pointer;
+}
+.arrow.active {
+    color: #007bff;
+}

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Sensor</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles2.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="text-center py-4">
+            <h3>Smart House System</h3>
+        </div>
+        <a href="index.html">Dashboard</a>
+        <a href="datasensor.html">Data Sensor</a>
+        <a href="history.html">Activity History</a>
+        <a href="profile.html">Profile</a>
+    </div>
+    <div class="content">
+        <div class="container">
+            <h4>Real-Time Sensor Data</h4>
+            <button class="btn btn-danger mb-3" onclick="deleteAllSensorData()">Delete All Sensor Data</button>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th onclick="sortTable('time')">Time
+                            <span class="arrow" id="time-arrow">⬆️⬇️</span>
+                        </th>
+                        <th onclick="sortTable('temperature')">Temperature (°C)
+                            <span class="arrow" id="temperature-arrow">⬆️⬇️</span>
+                        </th>
+                        <th onclick="sortTable('humidity')">Humidity (%)
+                            <span class="arrow" id="humidity-arrow">⬆️⬇️</span>
+                        </th>
+                        <th onclick="sortTable('light')">Light (Lux)
+                            <span class="arrow" id="light-arrow">⬆️⬇️</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="sensor-body">
+                    <!-- Data will be populated here -->
+                </tbody>
+            </table>
+            <nav>
+                <ul class="pagination justify-content-center" id="pagination">
+                    <!-- Pagination will be populated here -->
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <script>
+        const maxEntries = 500;
+        const entriesPerPage = 10;
+        const sensorData = JSON.parse(localStorage.getItem('sensorData2')) || [];
+        let currentPage = 1;
+
+        function updateSensorData() {
+            const now = new Date().toLocaleTimeString();
+            const temperature = (Math.random() * 10 + 20).toFixed(1);
+            const humidity = (Math.random() * 20 + 40).toFixed(1);
+            const light = (Math.random() * 500 + 100).toFixed(0);
+
+            if (sensorData.length >= maxEntries) {
+                sensorData.pop(); // Remove the oldest entry
+            }
+
+            sensorData.unshift({ time: now, temperature, humidity, light });
+            localStorage.setItem('sensorData2', JSON.stringify(sensorData));
+            renderTable();
+            renderPagination();
+        }
+
+        function renderTable() {
+            const sensorBody = document.getElementById('sensor-body');
+            sensorBody.innerHTML = '';
+
+            const start = (currentPage - 1) * entriesPerPage;
+            const end = start + entriesPerPage;
+            const pageData = sensorData.slice(start, end);
+
+            pageData.forEach(entry => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${entry.time}</td>
+                    <td>${entry.temperature}</td>
+                    <td>${entry.humidity}</td>
+                    <td>${entry.light}</td>
+                `;
+                sensorBody.appendChild(row);
+            });
+        }
+
+        function renderPagination() {
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+
+            const totalPages = Math.ceil(sensorData.length / entriesPerPage);
+            const maxVisiblePages = 5;
+                let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+                let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+                if (endPage - startPage < maxVisiblePages - 1) {
+                    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                }
+
+                if (startPage > 1) {
+                    pagination.appendChild(createPageItem(1));
+                    if (startPage > 2) {
+                        pagination.appendChild(createEllipsis());
+                    }
+                }
+
+                for (let i = startPage; i <= endPage; i++) {
+                    pagination.appendChild(createPageItem(i));
+                }
+
+                if (endPage < totalPages) {
+                    if (endPage < totalPages - 1) {
+                        pagination.appendChild(createEllipsis());
+                    }
+                    pagination.appendChild(createPageItem(totalPages));
+                }
+            }
+
+            function createPageItem(page) {
+                const li = document.createElement('li');
+                li.classList.add('page-item');
+                if (page === currentPage) {
+                    li.classList.add('active');
+                }
+                li.innerHTML = `<a class="page-link" href="#">${page}</a>`;
+                li.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    currentPage = page;
+                    renderTable(currentPage);
+                    renderPagination();
+                });
+                return li;
+            }
+
+            function createEllipsis() {
+                const li = document.createElement('li');
+                li.classList.add('page-item', 'disabled');
+                li.innerHTML = `<span class="page-link">...</span>`;
+                return li;
+            }
+            let sortDirection = 1; // 1 for ascending, -1 for descending
+    let currentSortAttribute = '';
+
+    function sortTable(attribute) {
+        if (currentSortAttribute === attribute) {
+            sortDirection *= -1; // Toggle sort direction
+        } else {
+            currentSortAttribute = attribute;
+            sortDirection = 1; // Default to ascending
+        }
+
+        sensorData.sort((a, b) => {
+            if (a[attribute] < b[attribute]) return -1 * sortDirection;
+            if (a[attribute] > b[attribute]) return 1 * sortDirection;
+            return 0;
+        });
+
+        updateArrows(attribute);
+        renderTable();
+        renderPagination();
+    }
+
+    function updateArrows(attribute) {
+        const arrows = document.querySelectorAll('.arrow');
+        arrows.forEach(arrow => arrow.classList.remove('active'));
+
+        const arrow = document.getElementById(`${attribute}-arrow`);
+        arrow.classList.add('active');
+        arrow.innerHTML = sortDirection === 1 ? '⬆️' : '⬇️';
+    }
+
+    function deleteAllSensorData() {
+        sensorData.length = 0; // Clear the array
+        localStorage.removeItem('sensorData2'); // Clear the data from localStorage
+        renderTable();
+        renderPagination();
+    }
+
+        setInterval(updateSensorData, 6000);
+    </script>
+</body>
+</html>
